@@ -10,6 +10,7 @@ require('dotenv').config();
 // import routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
+const categoryRoutes = require('./routes/category');
 
 // setup express app
 const app = express();
@@ -32,6 +33,7 @@ app.use(cookieParser());
 // routes middleware
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
+app.use('/api', categoryRoutes);
 
 const port = process.env.PORT;
 app.listen(port, () => console.log(`server is listening on ${port}`));
