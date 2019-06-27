@@ -4,16 +4,14 @@ const fs = require('fs');
 const Product = require('../models/product');
 const { errorHandler } = require('../helpers/dbErrorHandlers');
 
-exports.productById = (req, res, next, id) => {
-  Product.findById(id).exec((err, product) => {
-    if (err || !product) {
-      return res.status(400).json({
-        error: 'Product not found'
-      });
-    }
+exports.productById = async (req, res, next, id) => {
+  try {
+    const product = await Product.findById(id).exec();
     req.product = product;
     next();
-  });
+  } catch (err) {
+    return res.status(400).json({ error: 'Product not found' });
+  }
 };
 
 exports.getProduct = (req, res) => {
@@ -60,26 +58,20 @@ exports.createProduct = (req, res) => {
     }
 
     product.save((err, result) => {
-      if (err) {
-        return res.status(400).json({
-          error: errorHandler(err)
-        });
-      }
+      if (err) return res.status(400).json({ error: errorHandler(err) });
       res.json(result);
     });
   });
 };
 
-exports.removeProduct = (req, res) => {
+exports.removeProduct = async (req, res) => {
   const { product } = req;
-  product.remove((err, deletedProduct) => {
-    if (err) {
-      return res.status(400).json({
-        error: errorHandler(err)
-      });
-    }
+  try {
+    await product.remove();
     res.json({ message: 'Product deleted successfully' });
-  });
+  } catch (err) {
+    return res.status(400).json({ error: errorHandler(err) });
+  }
 };
 
 exports.updateProduct = (req, res) => {
