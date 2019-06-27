@@ -7,6 +7,9 @@
     "prettier"
   ],
   "rules": {
+    "import/newline-after-import": "off",
+    "consistent-return": "off",
+    "no-shadow": "off",
     "prettier/prettier": [
       "error"
     ]
