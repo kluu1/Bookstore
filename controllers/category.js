@@ -1,66 +1,56 @@
 const Category = require('../models/category');
 const { errorHandler } = require('../helpers/dbErrorHandlers');
 
-exports.categoryById = (req, res, next, id) => {
-  Category.findById(id).exec((err, category) => {
-    if (err || !category) {
-      return res.status(400).json({
-        error: 'Category does not exist'
-      });
-    }
+exports.categoryById = async (req, res, next, id) => {
+  try {
+    const category = await Category.findById(id).exec();
     req.category = category;
     next();
-  });
-};
-
-exports.create = (req, res) => {
-  const category = new Category(req.body);
-  category.save((err, data) => {
-    if (err) {
-      return res.status(400).json({
-        error: errorHandler(err)
-      });
-    }
-    res.json({ data });
-  });
+  } catch (err) {
+    return res.status(400).json({ error: 'Category does not exist' });
+  }
 };
 
 exports.getCategory = (req, res) => {
   return res.json(req.category);
 };
 
-exports.updateCategory = (req, res) => {
-  const { category } = req;
-  category.name = req.body.name;
-  category.save((err, data) => {
-    if (err) {
-      return res.status(400).json({
-        error: errorHandler(err)
-      });
-    }
-    res.json(data);
-  });
+exports.createCategory = async (req, res) => {
+  const category = new Category(req.body);
+  try {
+    const data = await category.save();
+    res.json({ data });
+  } catch (err) {
+    return res.status(400).json({ error: errorHandler(err) });
+  }
 };
 
-exports.deleteCategory = (req, res) => {
+exports.updateCategory = async (req, res) => {
   const { category } = req;
-  category.remove((err, data) => {
-    if (err) {
-      return res.status(400).json({
-        error: errorHandler(err)
-      });
-    }
+  try {
+    category.name = req.body.name;
+    const data = await category.save();
+    res.json(data);
+  } catch (err) {
+    return res.status(400).json({ error: errorHandler(err) });
+  }
+};
+
+exports.deleteCategory = async (req, res) => {
+  const { category } = req;
+  try {
+    await category.remove();
     res.json({ message: 'Category deleted' });
-  });
+  } catch (err) {
+    return res.status(400).json({ error: errorHandler(err) });
+  }
 };
 
-exports.getAllCategories = (req, res) => {
-  Category.find().exec((err, data) => {
-    if (err) {
-      return res.status(400).json({
-        error: errorHandler(err)
-      });
-    }
+exports.getAllCategories = async (req, res) => {
+  try {
+    const data = await Category.find().exec();
     res.json(data);
-  });
+  } catch (err) {
+    return res.status(400).json({ error: errorHandler(err) });
+  }
 };

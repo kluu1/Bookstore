@@ -2,18 +2,28 @@ const express = require('express');
 const router = express.Router();
 
 const {
-  create,
+  createCategory,
   categoryById,
   getCategory,
   updateCategory,
   deleteCategory,
   getAllCategories
 } = require('../controllers/category');
+
 const { requireSignin, isAuth, isAdmin } = require('../controllers/auth');
 const { userById } = require('../controllers/user');
 
+router.get('/categories', getAllCategories);
 router.get('/category/:categoryId', getCategory);
-router.post('/category/create/:userId', requireSignin, isAuth, isAdmin, create);
+
+router.post(
+  '/category/createCategory/:userId',
+  requireSignin,
+  isAuth,
+  isAdmin,
+  createCategory
+);
+
 router.put(
   '/category/:categoryId/:userId',
   requireSignin,
@@ -21,6 +31,7 @@ router.put(
   isAdmin,
   updateCategory
 );
+
 router.delete(
   '/category/:categoryId/:userId',
   requireSignin,
@@ -28,7 +39,6 @@ router.delete(
   isAdmin,
   deleteCategory
 );
-router.get('/categories', getAllCategories);
 
 router.param('categoryId', categoryById);
 router.param('userId', userById);
