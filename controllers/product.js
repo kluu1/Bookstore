@@ -21,7 +21,7 @@ exports.getProduct = (req, res) => {
   return res.json(req.product);
 };
 
-exports.create = (req, res) => {
+exports.createProduct = (req, res) => {
   const form = new formidable.IncomingForm();
   form.keepExtensions = true;
   form.parse(req, (err, fields, files) => {
@@ -130,4 +130,29 @@ exports.updateProduct = (req, res) => {
       res.json(result);
     });
   });
+};
+
+/**
+ * SELL / ARRIVAL
+ * by sell: /products?sortBy=sold&orderBy=desc&limit=4
+ * by arrival: /products?sortBy=createdAt&orderBy=desc&limit=4
+ * if no params are sent, then all products are returned
+ */
+
+exports.getAllProducts = async (req, res) => {
+  const orderBy = req.query.orderBy ? req.query.orderBy : 'asc';
+  const sortBy = req.query.sortBy ? req.query.sortBy : '_id';
+  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 6;
+
+  try {
+    const products = await Product.find()
+      .select('-photo')
+      .populate('category')
+      .sort([[sortBy, orderBy]])
+      .limit(limit)
+      .exec();
+    res.send(products);
+  } catch (err) {
+    return res.status(400).json({ error: 'Products not found' });
+  }
 };
