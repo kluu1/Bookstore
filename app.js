@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 require('dotenv').config();
 
@@ -15,8 +16,13 @@ const productRoutes = require('./routes/product');
 
 // setup express app
 const app = express();
+
+// middlewares
+app.use(morgan('dev'));
 app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(expressValidator());
+app.use(cors());
 
 // connect to database
 mongoose
@@ -25,11 +31,6 @@ mongoose
     useCreateIndex: true
   })
   .then(() => console.log('connected to database..'));
-
-// middlewares
-
-app.use(morgan('dev'));
-app.use(cookieParser());
 
 // routes middleware
 app.use('/api', authRoutes);

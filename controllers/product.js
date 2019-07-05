@@ -28,17 +28,10 @@ exports.createProduct = (req, res) => {
         error: 'Image could not be uploaded'
       });
     }
-    // validate all fields are present
+
     const { name, description, price, category, quantity, shipping } = fields;
 
-    if (
-      !name ||
-      !description ||
-      !price ||
-      !category ||
-      !quantity ||
-      !shipping
-    ) {
+    if (!name || !description || !price || !category || !quantity || !shipping) {
       return res.status(400).json({
         error: 'All fields are required'
       });
@@ -86,14 +79,7 @@ exports.updateProduct = (req, res) => {
     // validate all fields are present
     const { name, description, price, category, quantity, shipping } = fields;
 
-    if (
-      !name ||
-      !description ||
-      !price ||
-      !category ||
-      !quantity ||
-      !shipping
-    ) {
+    if (!name || !description || !price || !category || !quantity || !shipping) {
       return res.status(400).json({
         error: 'All fields are required'
       });
@@ -147,4 +133,83 @@ exports.getAllProducts = async (req, res) => {
   } catch (err) {
     return res.status(400).json({ error: 'Products not found' });
   }
+};
+
+/**
+ * find the products based on req product category
+ * other products with the same category, will be returned
+ */
+exports.getRelated = async (req, res) => {
+  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 6;
+  try {
+    const products = await Product.find({
+      _id: { $ne: req.product },
+      category: req.product.category
+    })
+      .limit(limit)
+      .populate('category', '_id name')
+      .exec();
+    res.send(products);
+  } catch (err) {
+    return res.status(400).json({ error: 'Products not found' });
+  }
+};
+
+/**
+ * return categories based on products
+ */
+exports.getCategories = async (req, res) => {
+  try {
+    const categories = await Product.distinct('category', {});
+    res.json(categories);
+  } catch (err) {
+    return res.status(400).json({ error: 'Categories not found' });
+  }
+};
+
+/**
+ * get products by search
+ */
+exports.getBySearch = async (req, res) => {
+  const order = req.body.order ? req.body.order : 'desc';
+  const sortBy = req.body.sortBy ? req.body.sortBy : '_id';
+  const limit = req.body.limit ? parseInt(req.body.limit, 10) : 100;
+  const skip = parseInt(req.body.skip, 10);
+  const findArgs = {};
+
+  for (let key in req.body.filters) {
+    if (req.body.filters[key].length > 0) {
+      if (key === 'price') {
+        // gte -  greater than price [0-10]
+        // lte - less than
+        findArgs[key] = {
+          $gte: req.body.filters[key][0],
+          $lte: req.body.filters[key][1]
+        };
+      } else {
+        findArgs[key] = req.body.filters[key];
+      }
+    }
+  }
+
+  try {
+    const products = await Product.find(findArgs)
+      .select('-photo')
+      .populate('category')
+      .sort([[sortBy, order]])
+      .skip(skip)
+      .limit(limit)
+      .exec();
+    res.json({ size: products.length, products });
+  } catch (err) {
+    return res.status(400).json({ error: 'Products not found' });
+  }
+};
+
+exports.photo = (req, res, next) => {
+  if (req.product.photo.data) {
+    res.set('Content-Type', req.product.photo.contentType);
+    return res.send(req.product.photo.data);
+  }
+  next();
 };
