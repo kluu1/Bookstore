@@ -24,3 +24,18 @@ export const login = user => {
     data: JSON.stringify(user)
   });
 };
+
+export const authenticate = (data, next) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('jwt', JSON.stringify(data));
+    next();
+  }
+};
+
+export const signout = (next) => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('jwt');
+    next();
+    return axios({ method: 'GET', url: `${API_URL}/signout` });
+  }
+};
