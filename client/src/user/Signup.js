@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../core/Layout';
-import { API_URL } from '../config';
-import axios from 'axios';
+import { signup } from '../auth';
 
 const Signup = () => {
   const [values, setValues] = useState({
@@ -21,6 +20,7 @@ const Signup = () => {
 
   const clickSubmit = async event => {
     event.preventDefault();
+    setValues({ ...values, error: false });
     try {
       await signup({ name, email, password });
       setValues({
@@ -38,18 +38,6 @@ const Signup = () => {
         success: false
       });
     }
-  };
-
-  const signup = user => {
-    return axios({
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      },
-      url: `${API_URL}/signup`,
-      data: JSON.stringify(user)
-    });
   };
 
   const signUpForm = () => (

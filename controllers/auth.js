@@ -16,7 +16,7 @@ exports.signup = async (req, res) => {
   }
 };
 
-exports.signin = async (req, res) => {
+exports.login = async (req, res) => {
   // find the user based on email
   const { email, password } = req.body;
   const user = await User.findOne({ email });
