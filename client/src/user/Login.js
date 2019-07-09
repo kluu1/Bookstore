@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import Layout from '../core/Layout';
-import { login } from '../auth';
+import { login, authenticate } from '../auth';
 
 const Login = () => {
   const [values, setValues] = useState({
-    email: '',
-    password: '',
+    email: 'joe@gmail.com',
+    password: 'password123',
     error: '',
     loading: false,
     redirectToReferrer: false
@@ -28,10 +28,12 @@ const Login = () => {
     event.preventDefault();
     setValues({ ...values, error: false, loading: true });
     try {
-      await login({ email, password });
-      setValues({
-        ...values,
-        redirectToReferrer: true
+      const user = await login({ email, password });
+      authenticate(user.data, () => {
+        setValues({
+          ...values,
+          redirectToReferrer: true
+        });
       });
     } catch (err) {
       setValues({
@@ -89,8 +91,8 @@ const Login = () => {
 
   return (
     <Layout
-      title="Signup Page"
-      description="Signup to Node React E-commerce App"
+      title="Login"
+      description="Login to Node React E-commerce App"
       className="container col-md-8 offset-md-2"
     >
       {showLoading()}

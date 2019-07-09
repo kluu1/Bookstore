@@ -32,6 +32,13 @@ export const authenticate = (data, next) => {
   }
 };
 
+export const isAuthenticated = () => {
+  const token = localStorage.getItem('jwt');
+  if (typeof window == 'undefined') return false;
+  if (!token) return false;
+  return JSON.parse(token);
+};
+
 export const signout = (next) => {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('jwt');
