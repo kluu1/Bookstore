@@ -13,3 +13,19 @@ export const createCategory = (userId, token, category) => {
     data: JSON.stringify(category)
   });
 };
+
+export const createProduct = (userId, token, product) => {
+  return axios({
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    url: `${API_URL}/product/createProduct/${userId}`,
+    data: product
+  });
+};
+
+export const getCategories = () => {
+  return axios.get(`${API_URL}/categories`);
+};

@@ -17,8 +17,8 @@ const AddCategory = () => {
     setName(e.target.value);
   };
 
-  const clickSubmit = async event => {
-    event.preventDefault();
+  const clickSubmit = async e => {
+    e.preventDefault();
     setError('');
     setSuccess(false);
     // make request to api to create category
@@ -26,7 +26,6 @@ const AddCategory = () => {
       await createCategory(user._id, token, { name });
       setError('');
       setSuccess(true);
-
     } catch (err) {
       setError(err);
     }
@@ -44,32 +43,36 @@ const AddCategory = () => {
           autoFocus
         />
       </div>
-      <button onClick={clickSubmit} className="btn btn-outline-primary" on>Create Category</button>
+      <button onClick={clickSubmit} className="btn btn-outline-primary" on>
+        Create Category
+      </button>
     </form>
   );
 
   const showSuccess = () => {
     if (success) {
-      return <h3 className="text-success">{name} created successfully!</h3>
+      return <h3 className="text-success">{name} created successfully!</h3>;
     }
   };
 
   const showError = () => {
     if (error) {
-      return <h3 className="text-danger">Category must be unique!</h3>
+      return <h3 className="text-danger">Category must be unique!</h3>;
     }
   };
 
   const goBack = () => (
     <div className="mt-5">
-      <Link to="/admin/dashboard" className="text-warning">Back to Dashboard</Link>
+      <Link to="/admin/dashboard" className="text-warning">
+        Back to Dashboard
+      </Link>
     </div>
   );
 
   return (
     <Layout
       title="Add a new category"
-      description={`Ready to add a new category`}
+      description={`Hello ${user.name}, ready to add a new category`}
     >
       <div className="row">
         <div className="col-md-8 offset-md-2">
